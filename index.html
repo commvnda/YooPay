@@ -593,7 +593,7 @@
             setTimeout(() => {
                 const btn = document.getElementById('heptapaybtn');
                 if (btn && btn.disabled) {
-                    failButton("Secure checkout is taking too long to start. Refresh and try again.");
+                    setPaymentStatus("Still preparing secure checkout...");
                 }
             }, 12000);
         })();

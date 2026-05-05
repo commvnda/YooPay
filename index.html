@@ -422,7 +422,7 @@
                 <span class="hpayres" style="display:block; min-height:20px; margin-top:14px; text-align:center; font-size:14px; font-weight:600;"></span>
 
                 <!-- Action Button -->
-                <button id="heptapaybtn" onclick="pay()" disabled class="pay-btn font-brand">
+                <button id="heptapaybtn" onclick="startPayment()" disabled class="pay-btn font-brand">
                     <span id="btnText">Initializing...</span>
                     <!-- SVG Send Icon -->
                     <svg id="btnIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -503,6 +503,19 @@
                 }
             }
 
+            function showLoadingButton() {
+                const btn = document.getElementById('heptapaybtn');
+                const btnText = document.getElementById('btnText');
+                const btnSpinner = document.getElementById('btnSpinner');
+                const btnIcon = document.getElementById('btnIcon');
+
+                if (btn) btn.disabled = true;
+                if (btnText) btnText.innerText = "Starting checkout...";
+                if (btnSpinner) btnSpinner.style.display = 'block';
+                if (btnIcon) btnIcon.style.display = 'none';
+                setPaymentStatus("Connecting to secure checkout...");
+            }
+
             function failButton(message) {
                 const btn = document.getElementById('heptapaybtn');
                 const btnText = document.getElementById('btnText');
@@ -515,6 +528,30 @@
                 if (btnIcon) btnIcon.style.display = 'none';
                 setPaymentStatus(message, true);
             }
+
+            window.startPayment = function () {
+                if (typeof window.pay !== 'function') {
+                    failButton("Secure checkout is not ready. Please refresh and try again.");
+                    return;
+                }
+
+                showLoadingButton();
+
+                try {
+                    const payment = window.pay();
+                    if (payment && typeof payment.finally === 'function') {
+                        payment.finally(() => {
+                            const btn = document.getElementById('heptapaybtn');
+                            if (btn && btn.disabled) {
+                                activateButton();
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.warn("Payment start error:", error);
+                    failButton("Unable to start secure checkout. Please try again.");
+                }
+            };
 
             function loadScript(src, id, attributes = {}) {
                 return new Promise((resolve, reject) => {

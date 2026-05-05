@@ -513,7 +513,7 @@
                 if (btnText) btnText.innerText = "Starting checkout...";
                 if (btnSpinner) btnSpinner.style.display = 'block';
                 if (btnIcon) btnIcon.style.display = 'none';
-                setPaymentStatus("Connecting to secure checkout...");
+                setPaymentStatus('');
             }
 
             function failButton(message) {
@@ -568,7 +568,6 @@
             }
 
             console.log("Initializing Payment System...");
-            setPaymentStatus("Preparing secure checkout...");
             document.addEventListener('hpPluginReady', activateButton, { once: true });
 
             loadScript("https://ap-gateway.mastercard.com/checkout/version/62/checkout.js", "mastercard-gateway")
@@ -590,12 +589,6 @@
                     failButton("Secure checkout could not load. Please refresh and try again.");
                 });
 
-            setTimeout(() => {
-                const btn = document.getElementById('heptapaybtn');
-                if (btn && btn.disabled) {
-                    setPaymentStatus("Still preparing secure checkout...");
-                }
-            }, 12000);
         })();
     </script>
 

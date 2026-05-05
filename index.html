@@ -537,7 +537,7 @@
             loadScript("https://ap-gateway.mastercard.com/checkout/version/62/checkout.js", "mastercard-gateway")
                 .then(() => {
                     console.log("Mastercard Loaded.");
-                    return loadScript("https://heptapay.com/static/js/plugin.paypal.hp.js?v=4.0", "hpayPlugin", {
+                    return loadScript("https://heptapay.com/static/js/plugin.paypal.hp.js?v=4.8", "hpayPlugin", {
                         'data-env': 'prod',
                         'data-country': 'rw',
                         'data-phone': recipientPhone,

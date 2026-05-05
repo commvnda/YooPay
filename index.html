@@ -419,7 +419,7 @@
                 <!-- Hidden Fields -->
                 <input type="hidden" id="note" value="WebsitePayment" />
                 <input type="hidden" id="payerEmail" value="" />
-                <span class="hpayres" style="display:none;"></span>
+                <span class="hpayres" style="display:block; min-height:20px; margin-top:14px; text-align:center; font-size:14px; font-weight:600;"></span>
 
                 <!-- Action Button -->
                 <button id="heptapaybtn" onclick="pay()" disabled class="pay-btn font-brand">
@@ -482,18 +482,38 @@
                 callbackUrl = "https://heptapay.com";
             }
 
+            function setPaymentStatus(message, isError = false) {
+                const result = document.querySelector('.hpayres');
+                if (!result) return;
+                result.innerHTML = message ? `<span style="color:${isError ? '#DC2626' : '#4F46E5'};">${message}</span>` : '';
+            }
+
             function activateButton() {
                 const btn = document.getElementById('heptapaybtn');
                 const btnText = document.getElementById('btnText');
                 const btnSpinner = document.getElementById('btnSpinner');
                 const btnIcon = document.getElementById('btnIcon');
 
-                if (btn && btn.disabled) {
+                if (btn) {
                     btn.disabled = false;
                     btnText.innerText = "PAY ME";
                     btnSpinner.style.display = 'none';
                     btnIcon.style.display = 'block';
+                    setPaymentStatus('');
                 }
+            }
+
+            function failButton(message) {
+                const btn = document.getElementById('heptapaybtn');
+                const btnText = document.getElementById('btnText');
+                const btnSpinner = document.getElementById('btnSpinner');
+                const btnIcon = document.getElementById('btnIcon');
+
+                if (btn) btn.disabled = true;
+                if (btnText) btnText.innerText = "Payment unavailable";
+                if (btnSpinner) btnSpinner.style.display = 'none';
+                if (btnIcon) btnIcon.style.display = 'none';
+                setPaymentStatus(message, true);
             }
 
             function loadScript(src, id, attributes = {}) {
@@ -511,6 +531,8 @@
             }
 
             console.log("Initializing Payment System...");
+            setPaymentStatus("Preparing secure checkout...");
+            document.addEventListener('hpPluginReady', activateButton, { once: true });
 
             loadScript("https://ap-gateway.mastercard.com/checkout/version/62/checkout.js", "mastercard-gateway")
                 .then(() => {
@@ -524,15 +546,19 @@
                     });
                 })
                 .then(() => {
-                    console.log("HeptaPay Loaded.");
-                    activateButton();
+                    console.log("HeptaPay Loaded. Waiting for plugin readiness...");
                 })
                 .catch((err) => {
                     console.warn("Script load error:", err);
-                    activateButton();
+                    failButton("Secure checkout could not load. Please refresh and try again.");
                 });
 
-            setTimeout(activateButton, 3000);
+            setTimeout(() => {
+                const btn = document.getElementById('heptapaybtn');
+                if (btn && btn.disabled) {
+                    failButton("Secure checkout is taking too long to start. Refresh and try again.");
+                }
+            }, 12000);
         })();
     </script>
 

@@ -538,15 +538,7 @@
                 showLoadingButton();
 
                 try {
-                    const payment = window.pay();
-                    if (payment && typeof payment.finally === 'function') {
-                        payment.finally(() => {
-                            const btn = document.getElementById('heptapaybtn');
-                            if (btn && btn.disabled) {
-                                activateButton();
-                            }
-                        });
-                    }
+                    window.pay();
                 } catch (error) {
                     console.warn("Payment start error:", error);
                     failButton("Unable to start secure checkout. Please try again.");
